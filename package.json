@@ -1,0 +1,26 @@
+{
+  "name": "clubworx",
+  "version": "0.1.0",
+  "description": "A package for fetching data from Clubworx",
+  "main": "index.js",
+  "keywords": [
+    "clubworx",
+    "api",
+    "gym",
+    "reports"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sfw185/Clubworx.git"
+  },
+  "author": "Simon Wardan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sfw185/Clubworx/issues"
+  },
+  "homepage": "https://github.com/sfw185/Clubworx#readme",
+  "files": [
+    "index.js",
+    "README.md"
+  ]
+}
