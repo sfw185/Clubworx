@@ -25,7 +25,18 @@ const report = await session.reportById(reports[0].id);
 // Optional pagination parameters (default: page=1, count=100)
 const reportPage2 = await session.reportById(reports[0].id, { page: 2, count: 50 });
 
-console.log({ reports, report });
+// Get members with optional pagination and search
+const members = await session.members();
+// Returns: [{ id: 12345, name: "Jane Doe", firstName: "Jane", lastName: "Doe", ... }, ...]
+
+// With pagination and search
+const searchResults = await session.members({ page: 1, count: 50, search: 'Smith' });
+
+// Get a single member by ID
+const member = await session.memberById(members[0].id);
+// Returns: { id: 12345, name: "Jane Doe", firstName: "Jane", lastName: "Doe", ... }
+
+console.log({ reports, report, members, member });
 ```
 
 For CommonJS, use `const clubworx = require('clubworx')` and wrap in an async function.

@@ -27,6 +27,16 @@ async function test() {
       console.log('First report data:', JSON.stringify(firstReport, null, 2));
     }
 
+    console.log('\nFetching members...');
+    const members = await session.members({ page: 1, count: 10 });
+    console.log('Members:', JSON.stringify(members, null, 2));
+
+    if (members.length > 0) {
+      console.log('\nFetching first member by ID...');
+      const firstMember = await session.memberById(members[0].id);
+      console.log('First member data:', JSON.stringify(firstMember, null, 2));
+    }
+
   } catch (error) {
     console.error('Test failed:', error.message);
     console.error(error);

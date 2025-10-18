@@ -217,6 +217,49 @@ class Session {
       return obj;
     });
   }
+
+  // Helper to format member data consistently
+  _formatMemberData(member) {
+    return {
+      id: member.id,
+      name: member.name,
+      firstName: member.first_name || member.contact_information?.first_name,
+      lastName: member.last_name || member.contact_information?.last_name,
+      email: member.email || member.contact_information?.email,
+      phone: member.phone_number || member.contact_information?.phone_number,
+      imageUrl: member.image_url,
+      status: member.status || member.contact_information?.member_status,
+      goodStanding: member.good_standing
+    };
+  }
+
+  // Get members with optional pagination and search
+  async members(options = {}) {
+    const page = options.page || 1;
+    const count = options.count || 100;
+    const search = options.search || '';
+
+    let url = `https://app.clubworx.com/gyms/${this.gymId}/members?page=${page}&count=${count}`;
+    if (search) {
+      url += `&search=${encodeURIComponent(search)}`;
+    }
+
+    const response = await this.authenticatedRequest(url);
+    const data = JSON.parse(response.body);
+
+    // Return simplified member objects with just the essential fields
+    return data.collection.map(member => this._formatMemberData(member));
+  }
+
+  // Get a single member by ID
+  async memberById(id) {
+    const url = `https://app.clubworx.com/gyms/${this.gymId}/contacts/${id}`;
+    const response = await this.authenticatedRequest(url);
+    const data = JSON.parse(response.body);
+
+    // Return simplified member object with consistent structure
+    return this._formatMemberData(data);
+  }
 }
 
 module.exports = {
