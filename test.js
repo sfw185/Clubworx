@@ -37,6 +37,10 @@ async function test() {
       console.log('First member data:', JSON.stringify(firstMember, null, 2));
     }
 
+    console.log('\nFetching financials data...');
+    const financials = await session.financials();
+    console.log('Financials:', JSON.stringify(financials, null, 2));
+
   } catch (error) {
     console.error('Test failed:', error.message);
     console.error(error);

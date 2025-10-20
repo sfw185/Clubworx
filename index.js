@@ -260,6 +260,13 @@ class Session {
     // Return simplified member object with consistent structure
     return this._formatMemberData(data);
   }
+
+  // Get financials data from dashboard
+  async financials() {
+    const url = `https://app.clubworx.com/gyms/${this.gymId}/dashboard/financials`;
+    const response = await this.authenticatedRequest(url);
+    return JSON.parse(response.body);
+  }
 }
 
 module.exports = {
