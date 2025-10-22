@@ -206,12 +206,13 @@ class Session {
     const rows = data.rows || [];
     return rows.map(row => {
       const obj = {};
-      // Flatten the nested arrays - each row contains nested arrays of values
-      const flatValues = row.flat();
+      // Each row contains two arrays: [metadata, data]
+      // The second array (index 1) contains the actual values that map to columns
+      const values = Array.isArray(row) && row.length > 1 ? row[1] : row.flat();
 
       // Map each value to its corresponding column label
       columnLabels.forEach((label, index) => {
-        obj[label] = flatValues[index] !== undefined ? flatValues[index] : null;
+        obj[label] = values[index] !== undefined ? values[index] : null;
       });
 
       return obj;

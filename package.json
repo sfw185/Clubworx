@@ -1,6 +1,6 @@
 {
   "name": "clubworx",
-  "version": "0.3.0",
+  "version": "0.4.1",
   "description": "A package for fetching data from Clubworx",
   "main": "index.js",
   "exports": {

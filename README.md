@@ -1,6 +1,6 @@
 # Clubworx
 
-A package for fetching your own data from Clubworx. This package has a strict requirement for authentication (described below), and is in no way officially affiliated with Clubworx.
+A package for fetching your own data from Clubworx. This package is in no way officially affiliated with Clubworx.
 
 ## Install
 
