@@ -40,3 +40,33 @@ console.log({ reports, report, members, member });
 ```
 
 For CommonJS, use `const clubworx = require('clubworx')` and wrap in an async function.
+
+## Serverless Usage
+
+For serverless environments, you can serialize and restore sessions to avoid re-authenticating on every invocation:
+
+```js
+const { login, Session, SessionExpiredError } = require('clubworx');
+
+// First invocation - login and save session
+const session = await login('my@email.com', 'secret');
+const sessionData = session.toJSON();
+// Store sessionData in your preferred storage (Redis, DynamoDB, S3, etc.)
+await saveToStorage('session-key', JSON.stringify(sessionData));
+
+// Subsequent invocations - restore session from storage
+try {
+  const storedData = JSON.parse(await getFromStorage('session-key'));
+  const session = Session.fromJSON(storedData);
+  const reports = await session.allReports();
+} catch (error) {
+  if (error instanceof SessionExpiredError) {
+    // Session expired - login again and update storage
+    const session = await login('my@email.com', 'secret');
+    await saveToStorage('session-key', JSON.stringify(session.toJSON()));
+    const reports = await session.allReports();
+  } else {
+    throw error;
+  }
+}
+```

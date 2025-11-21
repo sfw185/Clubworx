@@ -2,6 +2,14 @@ const https = require('https');
 const { URL } = require('url');
 const querystring = require('querystring');
 
+// Custom error for expired sessions
+class SessionExpiredError extends Error {
+  constructor(message = 'Session has expired. Please login again.') {
+    super(message);
+    this.name = 'SessionExpiredError';
+  }
+}
+
 // Helper to make HTTPS requests
 function request(url, options = {}) {
   return new Promise((resolve, reject) => {
@@ -158,6 +166,22 @@ class Session {
     this.gymId = gymId;
   }
 
+  // Export session state as a plain object for storage (serverless-friendly)
+  toJSON() {
+    return {
+      cookies: this.cookies,
+      gymId: this.gymId
+    };
+  }
+
+  // Restore session from previously exported state
+  static fromJSON(data) {
+    if (!data || !data.cookies || !data.gymId) {
+      throw new Error('Invalid session data: must contain cookies and gymId');
+    }
+    return new Session(data.cookies, data.gymId);
+  }
+
   // Helper to make authenticated requests
   async authenticatedRequest(url, options = {}) {
     const cookieHeader = Array.isArray(this.cookies)
@@ -170,7 +194,18 @@ class Session {
       'Cookie': cookieHeader
     };
 
-    return request(url, { ...options, headers });
+    const response = await request(url, { ...options, headers });
+
+    // Check for session expiry (401 Unauthorized or 302 redirect to login)
+    if (response.statusCode === 401) {
+      throw new SessionExpiredError('Session has expired (401 Unauthorized). Please login again.');
+    }
+
+    if (response.statusCode === 302 && response.headers['location']?.includes('/users/sign_in')) {
+      throw new SessionExpiredError('Session has expired (redirected to login). Please login again.');
+    }
+
+    return response;
   }
 
   // Get summary of all reports (just ID and name)
@@ -271,5 +306,7 @@ class Session {
 }
 
 module.exports = {
-  login
+  login,
+  Session,
+  SessionExpiredError
 };
