@@ -36,7 +36,14 @@ const searchResults = await session.members({ page: 1, count: 50, search: 'Smith
 const member = await session.memberById(members[0].id);
 // Returns: { id: 12345, name: "Jane Doe", firstName: "Jane", lastName: "Doe", ... }
 
-console.log({ reports, report, members, member });
+// Add a note to a member
+const note = await session.addMemberNote(members[0].id, 'Subject', 'Note body text');
+// Returns: { id: 964591, subject: "Subject", body: "Note body text", created_at: "...", ... }
+
+// With optional tags
+const taggedNote = await session.addMemberNote(members[0].id, 'Follow-up', 'Call next week', ['urgent', 'callback']);
+
+console.log({ reports, report, members, member, note });
 ```
 
 For CommonJS, use `const clubworx = require('clubworx')` and wrap in an async function.

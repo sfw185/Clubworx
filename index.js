@@ -297,6 +297,48 @@ class Session {
     return this._formatMemberData(data);
   }
 
+  // Extract CSRF token from cookies (uses last token as it's most recent)
+  _getCsrfToken() {
+    const cookies = Array.isArray(this.cookies) ? this.cookies : [this.cookies];
+    let token = null;
+    for (const cookie of cookies) {
+      const match = cookie.match(/XSRF-TOKEN=([^;]+)/);
+      if (match) {
+        token = decodeURIComponent(match[1]);
+      }
+    }
+    return token;
+  }
+
+  // Add a note to a member/contact
+  async addMemberNote(memberId, subject, body, tags = []) {
+    const csrfToken = this._getCsrfToken();
+    if (!csrfToken) {
+      throw new Error('CSRF token not found in cookies');
+    }
+
+    const url = `https://app.clubworx.com/gyms/${this.gymId}/contacts/${memberId}/notes`;
+    const payload = JSON.stringify({
+      note: {
+        tag_list: tags,
+        subject: subject,
+        body: body
+      }
+    });
+
+    const response = await this.authenticatedRequest(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(payload),
+        'X-CSRF-Token': csrfToken
+      },
+      body: payload
+    });
+
+    return JSON.parse(response.body);
+  }
+
   // Get financials data from dashboard
   async financials() {
     const url = `https://app.clubworx.com/gyms/${this.gymId}/dashboard/financials`;
